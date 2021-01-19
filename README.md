@@ -26,7 +26,7 @@ Supported Types:
 
 ### Module reload
 
-```shell
+```python
 from hmr import Reloader
 
 import my_pkg
@@ -35,8 +35,8 @@ my_pkg = Reloader(my_pkg)
 
 If your application contains submodule that handle state, make sure you know 
 what you are doing. This could lead to unexpected behavior and unreproducible bugs.
-```shell
-from reload import Reloader
+```python
+from hmr import Reloader
 
 import my_pkg
 my_pkg = Reloader(my_pkg, excluded=['my_pkg.state'])
@@ -44,7 +44,7 @@ my_pkg = Reloader(my_pkg, excluded=['my_pkg.state'])
 
 ### Function/Class reload
 
-```shell
+```python
 from hmr import Reloader
 
 from my_pkg import func, Class
