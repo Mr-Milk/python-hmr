@@ -26,7 +26,7 @@ def write_raw(file, text):
 
 # every function need to sleep for a while to wait for the reload to complete
 class Package:
-    wait = 0.2
+    wait = 0.5
 
     def __init__(self):
         self.pkg = Path.cwd() / 'tests' / 'my_pkg'
