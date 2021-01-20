@@ -1,0 +1,8 @@
+# package
+watchdog~=1.0.2
+
+# test
+pytest~=6.2.1
+pytest-cov
+pytest-check
+setuptools~=51.3.3

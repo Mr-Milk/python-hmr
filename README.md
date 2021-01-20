@@ -4,53 +4,18 @@ Automatic reload your project when files are modified.
 
 No need to modify your source code.
 
-## Usage
+Supported Syntax:
 
-Just import your developing package
-
-Supported syntax:
-
-✅ ```import X```
-
-✅ ```import X as Y```
-
-✅ ```from X import Y```
+- ✅ ```import X```
+- ✅ ```import X as Y```
+- ✅ ```from X import Y```
+- ✅ ```from X import Y as A```
 
 Supported Types:
 
-✅ `Module`
-
-✅ `Function`
-
-✅ `Class`
-
-### Module reload
-
-```python
-from hmr import Reloader
-
-import my_pkg
-my_pkg = Reloader(my_pkg)
-```
-
-If your application contains submodule that handle state, make sure you know 
-what you are doing. This could lead to unexpected behavior and unreproducible bugs.
-```python
-from hmr import Reloader
-
-import my_pkg
-my_pkg = Reloader(my_pkg, excluded=['my_pkg.state'])
-```
-
-### Function/Class reload
-
-```python
-from hmr import Reloader
-
-from my_pkg import func, Class
-func = Reloader(func)
-Class = Reloader(Class)
-```
+- ✅ `Module`
+- ✅ `Function`
+- ✅ `Class`
 
 ## Installation
 
@@ -58,9 +23,65 @@ Class = Reloader(Class)
 pip install python-hmr
 ```
 
+## Usage
+
+Just import your developing package and replace it with `Reloader`.
+
+Then you can use it exactly like how you use a module before.
+
+```python
+import my_pkg
+
+from hmr import Reloader
+my_pkg = Reloader(my_pkg)
+
+my_pkg.func()
+# >>> "Hi from func"
+```
+
+### Module/Submodule reload
+
+```python
+import my_pkg.sub_module as sub
+
+from hmr import Reloader
+sub = Reloader(sub)
+```
+
+If your application contains submodule that handle state, 
+you can exclude it from reloading.
+
+`excluded` only works with module type
+
+> Make sure you know what you are doing. 
+> This could lead to unexpected behavior and unreproducible bugs.
+```python
+import my_pkg
+
+from hmr import Reloader
+my_pkg = Reloader(my_pkg, excluded=['my_pkg.state'])
+```
+
+### Function/Class reload
+
+No difference to reloading module
+
+```python
+from my_pkg import func, Class
+
+from hmr import Reloader
+func = Reloader(func)
+Class = Reloader(Class)
+```
+
+### Decorated Function reload
+
+Use [functools.wraps](https://docs.python.org/3/library/functools.html#functools.wraps) to preserve 
+signature of your function, or the function information will be replaced by the decorator itself.
+
 ## Acknowledgement
 
-This is a package develop for my own need, and inspired from the following package.
+Inspired from the following package.
 
 - [auto-reloader](https://github.com/moisutsu/auto-reloader)
 - [reloadr](https://github.com/hoh/reloadr)

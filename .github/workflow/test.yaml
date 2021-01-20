@@ -26,5 +26,13 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pip install pytest
-          # pytest --cov=spatialtis/ --cov-report=xml tests/
+          pip install -r requirements.dev.txt
+          pytest --cov=hmr/ --cov-report=xml tests/
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.6
+        with:
+          # User defined upload name. Visible in Codecov UI
+          name: python-hmr-cov
+          # Repository upload token - get it from codecov.io. Required only for private repositories
+          token: 84d4e0b2-b52a-4a2a-8776-b7044c19e025

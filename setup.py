@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 README = Path("README.md").read_text()
 
@@ -19,5 +19,5 @@ setup(name="python-hmr",
           "Programming Language :: Python :: 3",
       ],
       python_requires='>=3.6',
-      install_requires=['watchdog', 'redbaron'],
+      install_requires=['watchdog'],
       )
