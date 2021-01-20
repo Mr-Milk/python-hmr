@@ -1,2 +1,2 @@
 def file_func():
-    print("From a file")
+    return "Hi from file_func"

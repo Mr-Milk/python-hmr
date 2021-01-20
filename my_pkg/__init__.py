@@ -1,14 +1,20 @@
 from .sub_module import sub_func
-from .file import file_func
+from .file_module import file_func
+from .wrap import work_wrap
 
 
 def func():
-    print("hi from func!!!")
+    return "Hi from func"
+
+
+@work_wrap
+@work_wrap
+def decorated_func():
+    return 100
 
 
 class Class:
-    def __init__(self):
-        print("hi from class!!!")
+    v = 1
 
 
-Var = 1
+var = 1

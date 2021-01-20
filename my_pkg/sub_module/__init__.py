@@ -1,7 +1,15 @@
+from my_pkg.wrap import wrap
+
+
 def sub_func():
-    print("hi from sub_func")
+    return "Hi from sub_func"
+
+
+@wrap
+@wrap
+def decorated_sub_func():
+    return 100
 
 
 class SubClass:
-    def __init__(self):
-        print("hi from SubClass")
+    v = 1
