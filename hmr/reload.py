@@ -1,10 +1,9 @@
 import sys
+import warnings
 import weakref
 from importlib import reload
 from types import ModuleType, FunctionType
 from typing import List
-
-from redbaron import RedBaron
 
 
 class ReloadModule:
@@ -12,12 +11,8 @@ class ReloadModule:
     excluded = []
 
     def __init__(self, module, excluded=None):
-        if isinstance(module, ModuleType):
-            self.module = module
-        else:
-            raise TypeError("Must be a ModuleType")
-
-        if isinstance(excluded, List):
+        self.module = module
+        if excluded is not None:
             self.excluded = excluded
 
     def fire(self, module):
@@ -49,23 +44,25 @@ class ReloadObject:
         return instance
 
     def __getattr__(self, name):
-        return self.object.__getattr__(name)
+        return getattr(self.object, name)
 
     def fire(self) -> None:
         try:
             with open(self.object_file, 'r') as f:
                 source_code = f.read()
-            ast = RedBaron(source_code)
-            query_literal = 'def' if self.is_func else 'class'
-            source = ast.find_all(query_literal, name=self.object_name)[0].dumps()
             locals_: dict = {}
-            exec(source, self.object_module.__dict__, locals_)
-            self.object = locals_[self.object_name]
+            exec(source_code, self.object_module.__dict__, locals_)
+            new_obj = locals_.get(self.object_name)
+            if new_obj:
+                self.object = new_obj
+            else:
+                warnings.warn("Can't reload object. If it's a decorated function, use functools.wraps to "
+                              "preserve the function signature.", UserWarning)
             # Replace the old reference of all instances with the new one
             if not self.is_func:
                 for ref in self._instances:
                     instance = ref()  # We keep weak references to objects
                     if instance:
                         instance.__class__ = self.object
-        except SyntaxError as error:
-            print('SyntaxError', error)
+        except Exception as e:
+            print('An error occur:', e, file=sys.stderr)
