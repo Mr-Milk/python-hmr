@@ -117,35 +117,3 @@ class Package:
 @pytest.fixture(scope='module')
 def package(create_package):
     return Package()
-
-
-def reload_func(obj, call_obj, package, modify_func, assert_before, assert_after, **kwargs):
-    obj = Reloader(obj, **kwargs)
-
-    package.reset()
-    obj.reload()
-    check.equal(getattr(obj, call_obj).__call__(), assert_before)
-
-    getattr(package, modify_func).__call__()
-    cprint("The source code is ", inspect.getsource(getattr(obj, call_obj)))
-    cprint("The running result is ", getattr(obj, call_obj).__call__())
-    obj.reload()
-    check.equal(getattr(obj, call_obj).__call__(), assert_after)
-
-    obj.stop()
-
-
-def reload_class(obj, call_obj, attr, package, modify_func, assert_before, assert_after, **kwargs):
-    obj = Reloader(obj, **kwargs)
-
-    package.reset()
-    obj.reload()
-    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_before)
-
-    getattr(package, modify_func).__call__()
-
-    obj.reload()
-    cprint(inspect.getsource(getattr(obj, call_obj)))
-    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_after)
-
-    obj.stop()
