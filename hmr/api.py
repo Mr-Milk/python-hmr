@@ -15,7 +15,7 @@ from hmr.reload import ReloadModule, ReloadObject
 class EventsHandler(FileSystemEventHandler):
     reloader = None
 
-    def on_modified(self, event):
+    def on_any_event(self, event):
         self.reloader.reload()
 
 
@@ -75,6 +75,7 @@ class Reloader:
         ReloadModule(self.module, excluded=self.excluded).fire(self.module)
         if self.object is not None:
             self.object.fire()
+        # print(f"Reload success for {self.module.__spec__.name}")
 
     def stop(self):
         """Stop the monitor and reload"""

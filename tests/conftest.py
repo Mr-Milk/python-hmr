@@ -1,7 +1,21 @@
-import pytest
-from pathlib import Path
 import shutil
-from time import sleep
+from pathlib import Path
+
+import pytest
+import pytest_check as check
+import inspect
+
+from hmr import Reloader
+
+
+def pytest_addoption(parser):
+    parser.addoption("--wait", action="store", default=0.5,)
+
+
+def pytest_generate_tests(metafunc):
+    option_value = float(metafunc.config.option.wait)
+    if 'wait' in metafunc.fixturenames and option_value is not None:
+        metafunc.parametrize("wait", [option_value])
 
 
 @pytest.fixture(scope='module', autouse=True)
@@ -24,12 +38,16 @@ def write_raw(file, text):
         f.write(text)
 
 
+def cprint(*c):
+    p = False
+    if p:
+        print(*c)
+
+
 # every function need to sleep for a while to wait for the reload to complete
 class Package:
-    wait = 0
 
     def __init__(self):
-
         self.pkg = Path.cwd() / 'tests' / 'my_pkg'
         self.code_dir = dict(
             pkg_init=self.pkg / '__init__.py',
@@ -47,46 +65,47 @@ class Package:
         self.modify_module_decorated_func_content = self.pkg_init.replace("return 100", "return 10")
         self.modify_module_class_content = self.pkg_init.replace("v = 1", "v = 2")
         self.modify_file_module_func_content = self.pkg_file_module.replace("Hi from file_func", "Hello from file_func")
-        self.modify_sub_module_func_content = self.pkg_sub_module_init.replace("Hi from sub_func", "Hello from sub_func")
+        self.modify_sub_module_func_content = self.pkg_sub_module_init.replace("Hi from sub_func",
+                                                                               "Hello from sub_func")
         self.modify_sub_module_decorated_func_content = self.pkg_sub_module_init.replace("return 100", "return 10")
         self.modify_sub_module_class_content = self.pkg_sub_module_init.replace("v = 1", "v = 2")
         self.modify_subsubmodule_content = self.pkg_subsub_module_init.replace("x = 1", "x = 2")
 
     def raise_syntax_error(self):
         write_raw(self.code_dir['pkg_init'], self.raise_syntax_error_content)
-        print(read_raw(self.code_dir['pkg_init']))
+        cprint(read_raw(self.code_dir['pkg_init']))
 
     def modify_module_func(self):
         write_raw(self.code_dir['pkg_init'], self.modify_module_func_content)
-        print(read_raw(self.code_dir['pkg_init']))
+        cprint(read_raw(self.code_dir['pkg_init']))
 
     def modify_module_decorated_func(self):
         write_raw(self.code_dir['pkg_init'], self.modify_module_decorated_func_content)
-        print(read_raw(self.code_dir['pkg_init']))
+        cprint(read_raw(self.code_dir['pkg_init']))
 
     def modify_module_class(self):
         write_raw(self.code_dir['pkg_init'], self.modify_module_class_content)
-        print(read_raw(self.code_dir['pkg_init']))
+        cprint(read_raw(self.code_dir['pkg_init']))
 
     def modify_file_module_func(self):
         write_raw(self.code_dir['pkg_file_module'], self.modify_file_module_func_content)
-        print(read_raw(self.code_dir['pkg_file_module']))
+        cprint(read_raw(self.code_dir['pkg_file_module']))
 
     def modify_sub_module_func(self):
         write_raw(self.code_dir['pkg_sub_module_init'], self.modify_sub_module_func_content)
-        print(read_raw(self.code_dir['pkg_sub_module_init']))
+        cprint(read_raw(self.code_dir['pkg_sub_module_init']))
 
     def modify_sub_module_decorated_func(self):
         write_raw(self.code_dir['pkg_sub_module_init'], self.modify_sub_module_decorated_func_content)
-        print(read_raw(self.code_dir['pkg_sub_module_init']))
+        cprint(read_raw(self.code_dir['pkg_sub_module_init']))
 
     def modify_sub_module_class(self):
         write_raw(self.code_dir['pkg_sub_module_init'], self.modify_sub_module_class_content)
-        print(read_raw(self.code_dir['pkg_sub_module_init']))
+        cprint(read_raw(self.code_dir['pkg_sub_module_init']))
 
     def modify_subsubmodule(self):
         write_raw(self.code_dir['pkg_subsub_module_init'], self.modify_subsubmodule_content)
-        print(read_raw(self.code_dir['pkg_subsub_module_init']))
+        cprint(read_raw(self.code_dir['pkg_subsub_module_init']))
 
     def reset(self):
         write_raw(self.code_dir['pkg_init'], self.pkg_init)
@@ -98,3 +117,35 @@ class Package:
 @pytest.fixture(scope='module')
 def package(create_package):
     return Package()
+
+
+def reload_func(obj, call_obj, package, modify_func, assert_before, assert_after, **kwargs):
+    obj = Reloader(obj, **kwargs)
+
+    package.reset()
+    obj.reload()
+    check.equal(getattr(obj, call_obj).__call__(), assert_before)
+
+    getattr(package, modify_func).__call__()
+    cprint("The source code is ", inspect.getsource(getattr(obj, call_obj)))
+    cprint("The running result is ", getattr(obj, call_obj).__call__())
+    obj.reload()
+    check.equal(getattr(obj, call_obj).__call__(), assert_after)
+
+    obj.stop()
+
+
+def reload_class(obj, call_obj, attr, package, modify_func, assert_before, assert_after, **kwargs):
+    obj = Reloader(obj, **kwargs)
+
+    package.reset()
+    obj.reload()
+    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_before)
+
+    getattr(package, modify_func).__call__()
+
+    obj.reload()
+    cprint(inspect.getsource(getattr(obj, call_obj)))
+    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_after)
+
+    obj.stop()

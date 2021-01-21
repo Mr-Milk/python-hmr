@@ -27,7 +27,7 @@ jobs:
       - name: Test with pytest
         run: |
           pip install -r requirements.dev.txt
-          pytest --cov=hmr/ --cov-report=xml tests/
+          pytest --cov=hmr/ --cov-report=xml tests/ --wait 1
 
       - name: Codecov
         uses: codecov/codecov-action@v1.0.6
