@@ -1,102 +1,94 @@
 import pytest
 import pytest_check as check
 from hmr import Reloader
+from conftest import read_raw
+
+
+def reload_func(obj, call_obj, package, modify_func, assert_before, assert_after, **kwargs):
+    obj = Reloader(obj, **kwargs)
+
+    package.reset()
+    obj.reload()
+    check.equal(getattr(obj, call_obj).__call__(), assert_before)
+
+    getattr(package, modify_func).__call__()
+    obj.reload()
+    check.equal(getattr(obj, call_obj).__call__(), assert_after)
+
+    obj.stop()
+
+
+def reload_class(obj, call_obj, attr, package, modify_func, assert_before, assert_after, **kwargs):
+    obj = Reloader(obj, **kwargs)
+
+    package.reset()
+    obj.reload()
+    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_before)
+
+    getattr(package, modify_func).__call__()
+
+    print(read_raw(package.code_dir['pkg_sub_module_init']))
+    obj.reload()
+    check.equal(getattr(getattr(obj, call_obj).__call__(), attr), assert_after)
+
+    obj.stop()
 
 
 # import X
 def test_module(package):
     import my_pkg
-    my_pkg = Reloader(my_pkg, excluded=['my_pkg.sub_module'])
-
-    package.reset()
-    check.equal(my_pkg.func(), "Hi from func")
-
-    package.modify_module_func()
-    check.equal(my_pkg.func(), "Hello from func")
-
-    my_pkg.stop()
+    reload_func(my_pkg, 'func', package, 'modify_module_func',
+                "Hi from func", "Hello from func", excluded=['my_pkg.sub_module'])
 
 
 # import X as A
 def test_ref_module(package):
     import my_pkg as mp
-    mp = Reloader(mp)
-
-    package.reset()
-    check.equal(mp.func(), "Hi from func")
-
-    package.modify_module_func()
-    check.equal(mp.func(), "Hello from func")
-
-    mp.stop()
+    reload_func(mp, 'func', package, 'modify_module_func',
+                "Hi from func", "Hello from func")
 
 
 # import X.Y
 def test_submodule(package):
     import my_pkg.sub_module
-    my_pkg.sub_module = Reloader(my_pkg.sub_module)
-
-    package.reset()
-    check.equal(my_pkg.sub_module.sub_func(), "Hi from sub_func")
-
-    package.modify_sub_module_func()
-    check.equal(my_pkg.sub_module.sub_func(), "Hello from sub_func")
-
-    my_pkg.sub_module.stop()
-    del my_pkg.sub_module
+    reload_func(my_pkg.sub_module, 'sub_func', package, 'modify_sub_module_func',
+                "Hi from sub_func", "Hello from sub_func",)
 
 
 # import X.Y as A
 def test_ref_submodule(package):
     import my_pkg.sub_module as sub
-    sub = Reloader(sub)
 
-    package.reset()
-    check.equal(sub.SubClass().v, 1)
-
-    package.modify_sub_module_class()
-    check.equal(sub.SubClass().v, 2)
-
-    sub.stop()
+    reload_class(sub, 'SubClass', 'v', package, 'modify_sub_module_class',
+                 1, 2)
 
 
 # from X import Y
 def test_individual_submodule(package):
     from my_pkg import sub_module
-    sub_module = Reloader(sub_module)
-
-    package.reset()
-    check.equal(sub_module.sub_func(), "Hi from sub_func")
-
-    package.modify_sub_module_func()
-    check.equal(sub_module.sub_func(), "Hello from sub_func")
-
-    sub_module.stop()
+    reload_func(sub_module, 'sub_func', package, 'modify_sub_module_func',
+                "Hi from sub_func", "Hello from sub_func", )
 
 
 # from X import Y as A
 def test_ref_individual_submodule(package):
     from my_pkg import sub_module as sub
-    sub = Reloader(sub)
-
-    package.reset()
-    check.equal(sub.sub_func(), "Hi from sub_func")
-
-    package.modify_sub_module_func()
-    check.equal(sub.sub_func(), "Hello from sub_func")
-
-    sub.stop()
+    reload_func(sub, 'sub_func', package, 'modify_sub_module_func',
+                "Hi from sub_func", "Hello from sub_func", )
 
 
 # from X.Y import A
 def test_subsubmodule(package):
     from my_pkg.sub_module import subsub_module
+
     subsub_module = Reloader(subsub_module)
 
     package.reset()
+    subsub_module.reload()
     check.equal(subsub_module.x, 1)
 
     package.modify_subsubmodule()
+    subsub_module.reload()
     check.equal(subsub_module.x, 2)
 
     subsub_module.stop()
@@ -105,13 +97,6 @@ def test_subsubmodule(package):
 @pytest.mark.xfail
 def test_syntax_error(package):
     import my_pkg
-    my_pkg = Reloader(my_pkg)
+    reload_func(my_pkg, 'func', package, 'raise_syntax_error',
+                "Hi from func", "Hello from func")
 
-    package.reset()
-    check.equal(my_pkg.func(), "Hi from func")
-
-    package.raise_syntax_error()
-    check.equal(my_pkg.func(), "Hello from func")
-
-    my_pkg.stop()
-    package.reset()
