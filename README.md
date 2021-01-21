@@ -1,5 +1,7 @@
 # Python Hot Module Reload
 
+[![codecov](https://codecov.io/gh/Mr-Milk/python-hmr/branch/main/graph/badge.svg?token=PZ6LOFNVZ6)](https://codecov.io/gh/Mr-Milk/python-hmr)
+
 Automatic reload your project when files are modified.
 
 No need to modify your source code.
@@ -39,6 +41,18 @@ my_pkg.func()
 # >>> "Hi from func"
 ```
 
+Or you can manually reload it
+
+```python
+my_pkg.reload()
+```
+
+To stop the reloading
+
+```python
+my_pkg.stop()
+```
+
 ### Module/Submodule reload
 
 ```python
@@ -74,7 +88,7 @@ func = Reloader(func)
 Class = Reloader(Class)
 ```
 
-### Decorated Function reload
+### @Decorated Function reload
 
 Use [functools.wraps](https://docs.python.org/3/library/functools.html#functools.wraps) to preserve 
 signature of your function, or the function information will be replaced by the decorator itself.
