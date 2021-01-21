@@ -3,7 +3,6 @@ import warnings
 import weakref
 from importlib import reload
 from types import ModuleType, FunctionType
-from typing import List
 
 
 class ReloadModule:
@@ -47,22 +46,21 @@ class ReloadObject:
         return getattr(self.object, name)
 
     def fire(self) -> None:
-        try:
-            with open(self.object_file, 'r') as f:
-                source_code = f.read()
-            locals_: dict = {}
-            exec(source_code, self.object_module.__dict__, locals_)
-            new_obj = locals_.get(self.object_name)
-            if new_obj:
-                self.object = new_obj
-            else:
-                warnings.warn("Can't reload object. If it's a decorated function, use functools.wraps to "
-                              "preserve the function signature.", UserWarning)
-            # Replace the old reference of all instances with the new one
-            if not self.is_func:
-                for ref in self._instances:
-                    instance = ref()  # We keep weak references to objects
-                    if instance:
-                        instance.__class__ = self.object
-        except Exception as e:
-            print('An error occur:', e, file=sys.stderr)
+        """Reload the object"""
+        with open(self.object_file, 'r') as f:
+            source_code = f.read()
+        print(source_code)
+        locals_: dict = {}
+        exec(source_code, self.object_module.__dict__, locals_)
+        new_obj = locals_.get(self.object_name)
+        if new_obj:
+            self.object = new_obj
+        else:
+            warnings.warn("Can't reload object. If it's a decorated function, use functools.wraps to "
+                          "preserve the function signature.", UserWarning)
+        # Replace the old reference of all instances with the new one
+        if not self.is_func:
+            for ref in self._instances:
+                instance = ref()  # We keep weak references to objects
+                if instance:
+                    instance.__class__ = self.object

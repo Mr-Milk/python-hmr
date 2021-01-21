@@ -3,35 +3,48 @@ __all__ = ['Reloader']
 from importlib.util import find_spec, module_from_spec
 from pathlib import Path
 from types import ModuleType
-from typing import List, Callable
+from typing import List, Callable, Optional, Union, Any
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+from watchdog.observers.api import ObservedWatch
 
 from hmr.reload import ReloadModule, ReloadObject
 
 
 class EventsHandler(FileSystemEventHandler):
-    module = None
-    object = None
-    excluded = None
+    reloader = None
 
     def on_modified(self, event):
-        # print(f"File modified, reloading {self.module}")
-        ReloadModule(self.module, excluded=self.excluded).fire(self.module)
-        if self.object is not None:
-            self.object.fire()
+        self.reloader.reload()
 
 
 class Reloader:
-    module = None
-    object = None
-    object_type = None
-    excluded = None
-    observer = None
-    watch = None
+    """The reloader to proxy reloaded object
 
-    def __init__(self, obj, excluded=None):
+    Args:
+        obj: The object to be monitored and reloaded when file changes on the disk
+        excluded: Excluded the module that you don't want to be reloaded, only works when obj is `ModuleType`
+
+    Methods:
+        reload: Reload the object
+        stop: Stop the monitor process
+
+    If you object happens to have the same attribute name as `reload` and `stop`, directly call obj.__getattr__(attr)
+    to access your original attribute instead of the reloader's methods.
+
+    """
+    module: Optional[ModuleType] = None
+    object: Optional[Callable] = None
+    object_type: Union[ModuleType, Callable, None] = None
+    excluded: List = None
+    observer: Optional[Observer] = None
+    watch: Optional[ObservedWatch] = None
+
+    def __init__(self,
+                 obj: Any,
+                 excluded: Optional[List[str]] = None
+                 ):
         if isinstance(obj, ModuleType):
             self.object_type = ModuleType
             self.module = obj
@@ -40,27 +53,31 @@ class Reloader:
             self.module = module_from_spec(find_spec(obj.__module__))
             self.object = ReloadObject(obj, self.module)
         else:
-            raise TypeError("Hot Module Reload are supported for Module, Function and Class; "
-                            "Can't reload a static variable since we can't resolve its source"
+            raise TypeError("Hot Module Reload are supported for Module, Function and Class; Do not pass"
+                            "initialize class or function, use `func` not `func()`. "
+                            "If it's a static variable since we can't resolve its source"
                             ", try access it from the reloaded module. eg. my_module.variable")
 
         if isinstance(excluded, List):
             self.excluded = excluded
 
         path = Path(self.module.__spec__.origin).parent
-        # print(f"Monitor {path}")
         event_handler = EventsHandler()
-        event_handler.module = self.module
-        event_handler.excluded = self.excluded
-        if self.object is not None:
-            event_handler.object = self.object
+        event_handler.reloader = self
         observer = Observer()
         self.observer = observer
         self.watch = observer.schedule(event_handler, path, recursive=True)
         observer.setDaemon(True)
         observer.start()
 
+    def reload(self):
+        """Reload the object"""
+        ReloadModule(self.module, excluded=self.excluded).fire(self.module)
+        if self.object is not None:
+            self.object.fire()
+
     def stop(self):
+        """Stop the monitor and reload"""
         self.observer.unschedule(self.watch)
 
     def __call__(self, *args, **kwargs):
