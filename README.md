@@ -1,10 +1,14 @@
 # Python Hot Module Reload
 
-[![codecov](https://codecov.io/gh/Mr-Milk/python-hmr/branch/main/graph/badge.svg?token=PZ6LOFNVZ6)](https://codecov.io/gh/Mr-Milk/python-hmr)
+![Test status](https://img.shields.io/github/workflow/status/Mr-Milk/python-hmr/Test?label=Test&logo=github&style=flat-square)
+![codecov](https://img.shields.io/codecov/c/github/Mr-Milk/python-hmr?style=flat-square)
+![license-mit](https://img.shields.io/github/license/Mr-Milk/python-hmr?color=blue&style=flat-square)
 
 Automatic reload your project when files are modified.
 
 No need to modify your source code.
+
+![reload](img/reload_func.gif)
 
 Supported Syntax:
 
