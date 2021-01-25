@@ -1,3 +1,5 @@
+<img src="img/logo.svg" alt="python-hmr logo" align="left" height="50" />
+
 # Python Hot Module Reload
 
 ![Test status](https://img.shields.io/github/workflow/status/Mr-Milk/python-hmr/Test?label=Test&logo=github&style=flat-square)
@@ -91,6 +93,14 @@ from my_pkg import func, Class
 from hmr import Reloader
 func = Reloader(func)
 Class = Reloader(Class)
+```
+
+If your have multiple class instance, they will all be updated. 
+Both `a` and `b` will be updated.
+
+```python
+a = Class()
+b = Class()
 ```
 
 ### @Decorated Function reload
