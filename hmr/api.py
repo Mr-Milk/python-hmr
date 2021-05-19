@@ -18,10 +18,8 @@ class EventsHandler(FileSystemEventHandler):
     _last_error = None
 
     def on_any_event(self, event):
-        # print("file changed")
         try:
             self.reloader.reload()
-            # print("reload success", file=sys.stdout)
         except Exception as e:
             # only fire the same error once
             if self._last_error != str(e):
@@ -45,12 +43,12 @@ class Reloader:
 
     """
     _module: Optional[ModuleType] = None
-    _object: Optional[Callable] = None
+    _object: Union[Callable, ReloadObject, None] = None
     _object_type: Union[ModuleType, Callable, None] = None
     _excluded: List = None
     _last_error: str = None
-    observer: Optional[Observer] = None
-    watch: Optional[ObservedWatch] = None
+    _observer: Optional[Observer] = None
+    _watch: Optional[ObservedWatch] = None
 
     def __init__(self,
                  obj: Any,
@@ -76,8 +74,8 @@ class Reloader:
         event_handler = EventsHandler()
         event_handler.reloader = self
         observer = Observer()
-        self.observer = observer
-        self.watch = observer.schedule(event_handler, str(path), recursive=True)
+        self._observer = observer
+        self._watch = observer.schedule(event_handler, str(path), recursive=True)
         observer.setDaemon(True)
         observer.start()
 
@@ -86,11 +84,10 @@ class Reloader:
         ReloadModule(self._module, excluded=self._excluded).fire(self._module)
         if self._object is not None:
             self._object.fire()
-        # print(f"Reload success for {self._module.__spec__.name}")
 
     def stop(self):
         """Stop the monitor and reload"""
-        self.observer.unschedule(self.watch)
+        self._observer.unschedule(self._watch)
 
     def __call__(self, *args, **kwargs):
         return self._object.__call__(*args, **kwargs)
