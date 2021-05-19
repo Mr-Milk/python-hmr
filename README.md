@@ -1,4 +1,4 @@
-<img src="img/logo.svg" alt="python-hmr logo" align="left" height="50" />
+<img src="https://raw.githubusercontent.com/Mr-Milk/python-hmr/d642a1054d5502a020f107bebecba41abeb4c7ea/img/logo.svg" alt="python-hmr logo" align="left" height="50" />
 
 # Python Hot Module Reload
 
@@ -11,7 +11,7 @@ Automatic reload your project when files are modified.
 
 No need to modify your source code.
 
-![reload](img/reload_func.gif)
+![reload](https://github.com/Mr-Milk/python-hmr/blob/main/img/reload_func.gif?raw=true)
 
 Supported Syntax:
 
