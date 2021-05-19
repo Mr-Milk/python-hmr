@@ -69,20 +69,6 @@ from hmr import Reloader
 sub = Reloader(sub)
 ```
 
-If your application contains submodule that handle state, 
-you can exclude it from reloading.
-
-`excluded` only works with module type
-
-> Make sure you know what you are doing. 
-> This could lead to unexpected behavior and unreproducible bugs.
-```python
-import my_pkg
-
-from hmr import Reloader
-my_pkg = Reloader(my_pkg, excluded=['my_pkg.state'])
-```
-
 ### Function/Class reload
 
 No difference to reloading module
@@ -107,6 +93,44 @@ b = Class()
 
 Use [functools.wraps](https://docs.python.org/3/library/functools.html#functools.wraps) to preserve 
 signature of your function, or the function information will be replaced by the decorator itself.
+
+### State handling
+
+If your application contains submodule that handle state, 
+you can exclude it from reloading. You need to move it to
+a new `.py` file like `state.py` and everything from that
+file will not be reloaded.
+
+> Make sure you know what you are doing. 
+> This could lead to unexpected behavior and unreproducible bugs.
+
+```python
+import my_pkg
+
+from hmr import Reloader
+my_pkg = Reloader(my_pkg, excluded=["my_pkg.state"])
+```
+
+This will exclude the `my_pkg/state.py` from reloading.
+
+Even you only want to reload a submodule or a function, you
+still need to provide the `excluded` argument.
+
+```python
+import my_pkg.sub_module as sub
+from my_pkg import func
+
+from hmr import Reloader
+sub = Reloader(sub, excluded=["my_pkg.state"])
+func = Reloader(func, excluded=["my_pkg.state"])
+```
+
+## Implementation
+
+Current implementation is relied on the `importlib.reload`,
+which is not very graceful when handling state. Direct reading of
+AST may be a better solution for hot module reload in python,
+but it's too complicated, I might try it in the future.
 
 ## Acknowledgement
 
