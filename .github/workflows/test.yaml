@@ -30,7 +30,7 @@ jobs:
           pytest --cov=hmr/ --cov-report=xml tests/ --wait 1
 
       - name: Codecov
-        uses: codecov/codecov-action@v1.0.6
+        uses: codecov/codecov-action@v2.1.0
         with:
           # User defined upload name. Visible in Codecov UI
           name: python-hmr-cov
