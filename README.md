@@ -2,7 +2,7 @@
 
 # Python Hot Module Reload
 
-![Test status](https://img.shields.io/github/workflow/status/Mr-Milk/python-hmr/Test?label=Test&logo=github&style=flat-square)
+![Test status](https://img.shields.io/github/actions/workflow/status/Mr-Milk/python-hmr/test.yaml?label=Test&logo=github&style=flat-square)
 ![codecov](https://img.shields.io/codecov/c/github/Mr-Milk/python-hmr?style=flat-square)
 ![pypi](https://img.shields.io/pypi/v/python-hmr?logoColor=white&style=flat-square)
 ![license-mit](https://img.shields.io/github/license/Mr-Milk/python-hmr?color=blue&style=flat-square)
