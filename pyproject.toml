@@ -1,0 +1,14 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "python-hmr"
+authors = [{name = "Mr-Milk", email = "yb97643@um.edu.mo"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+requires-python = ">=3.8"
+urls = {Home="https://github.com/mr-milk/python-hmr"}
+dependencies = ["watchdog"]

@@ -13,9 +13,9 @@ jobs:
         python-version: [3.8]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -36,3 +36,10 @@ jobs:
           name: python-hmr-cov
           # Repository upload token - get it from codecov.io. Required only for private repositories
           token: 84d4e0b2-b52a-4a2a-8776-b7044c19e025
+
+      - name: Publish to test.ipynb pypi
+        env:
+          FLIT_INDEX_URL: https://test.ipynb.pypi.org/legacy/
+          FLIT_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          FLIT_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: flit publish || exit 0
