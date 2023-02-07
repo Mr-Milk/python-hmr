@@ -22,6 +22,7 @@ jobs:
       - name: Publish
         if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          FLIT_INDEX_URL: https://upload.pypi.org/legacy/
+          FLIT_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          FLIT_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: flit publish
