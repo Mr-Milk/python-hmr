@@ -1,23 +1,27 @@
 __all__ = ['Reloader']
 
-from importlib import invalidate_caches
-from importlib.util import find_spec, module_from_spec
-from pathlib import Path
+import sys
 from types import ModuleType
-from typing import List, Callable, Optional, Union, Any
+from typing import Callable, Any
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from watchdog.observers.api import ObservedWatch
 
 from hmr.reload import ModuleReloader, ObjectReloader
 
 
 class EventsHandler(FileSystemEventHandler):
     reloader = None
+    _last_error = None
 
     def on_any_event(self, event):
-        self.reloader.fire()
+        try:
+            self.reloader.fire()
+        except Exception as e:
+            # only fire the same error once
+            if self._last_error != str(e):
+                self._last_error = str(e)
+                print(e, file=sys.stderr)
 
 
 class Reloader:
@@ -52,8 +56,9 @@ class Reloader:
         event_handler = EventsHandler()
         event_handler.reloader = self.reloader
         observer = Observer()
-        self.observer = observer
-        self.watch = observer.schedule(event_handler, path, recursive=True)
+        self._observer = observer
+        self._watch = observer.schedule(event_handler, str(path),
+                                        recursive=True)
         observer.setDaemon(True)
         observer.start()
 
@@ -70,3 +75,4 @@ class Reloader:
 
     def __call__(self, *args, **kwargs):
         return self.reloader.__call__(*args, **kwargs)
+

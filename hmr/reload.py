@@ -1,7 +1,7 @@
 import sys
 import warnings
 import weakref
-from importlib import reload
+from importlib import reload, invalidate_caches
 from importlib.util import module_from_spec, find_spec
 from pathlib import Path
 from types import ModuleType, FunctionType
@@ -28,6 +28,7 @@ class ModuleReloader:
         return getattr(self.module, name)
 
     def fire(self):
+        invalidate_caches()
         _recursive_reload(self.module, self.excluded)
 
     def get_module_path(self):
