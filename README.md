@@ -9,16 +9,14 @@
 
 Automatic reload your project when files are modified.
 
-No need to modify your source code.
+No need to modify your source code. Works at any environment.
 
 ![reload](https://github.com/Mr-Milk/python-hmr/blob/main/img/reload_func.gif?raw=true)
 
 Supported Syntax:
 
 - ✅ ```import X```
-- ✅ ```import X as Y```
 - ✅ ```from X import Y```
-- ✅ ```from X import Y as A```
 
 Supported Types:
 
@@ -32,41 +30,35 @@ Supported Types:
 pip install python-hmr
 ```
 
-## Usage
+## Quick Start
 
-Just import your developing package and replace it with `Reloader`.
+Import your dev package as usual.
 
-Then you can use it exactly like how you use a module before.
+```python
+import my_pkg
+```
+
+Add 2 lines to automatically reload your source code.
+
 
 ```python
 import my_pkg
 
-from hmr import Reloader
-my_pkg = Reloader(my_pkg)
-
-my_pkg.func()
-# >>> "Hi from func"
+import hmr
+my_pkg = hmr.reload(my_pkg)
 ```
 
-Or you can manually reload it
+Now you are ready to go!
 
-```python
-my_pkg.reload()
-```
-
-To stop the reloading
-
-```python
-my_pkg.stop()
-```
+## Usage Manual
 
 ### Module/Submodule reload
 
 ```python
 import my_pkg.sub_module as sub
 
-from hmr import Reloader
-sub = Reloader(sub)
+import hmr
+sub = hmr.reload(sub)
 ```
 
 ### Function/Class reload
@@ -76,9 +68,9 @@ No difference to reloading module
 ```python
 from my_pkg import func, Class
 
-from hmr import Reloader
-func = Reloader(func)
-Class = Reloader(Class)
+import hmr
+func = hmr.reload(func)
+Class = hmr.reload(Class)
 ```
 
 If your have multiple class instance, they will all be updated. 
@@ -96,10 +88,9 @@ signature of your function, or the function information will be replaced by the 
 
 ### State handling
 
-If your application contains submodule that handle state, 
-you can exclude it from reloading. You need to move it to
-a new `.py` file like `state.py` and everything from that
-file will not be reloaded.
+If your application is not stateless, it's suggested that you 
+group all your state variable into the same `.py` file like `state.py` 
+and exclude that from being reloaded.
 
 > Make sure you know what you are doing. 
 > This could lead to unexpected behavior and unreproducible bugs.
@@ -107,30 +98,21 @@ file will not be reloaded.
 ```python
 import my_pkg
 
-from hmr import Reloader
-my_pkg = Reloader(my_pkg, excluded=["my_pkg.state"])
+import hmr
+my_pkg = hmr.reload(my_pkg, excluded=["my_pkg.state"])
 ```
 
-This will exclude the `my_pkg/state.py` from reloading.
+The `my_pkg/state.py` will not be reloaded, the state will persist.
 
-Even you only want to reload a submodule or a function, you
-still need to provide the `excluded` argument.
+The same apply when reloading a function or class.
 
 ```python
-import my_pkg.sub_module as sub
 from my_pkg import func
 
-from hmr import Reloader
-sub = Reloader(sub, excluded=["my_pkg.state"])
-func = Reloader(func, excluded=["my_pkg.state"])
+import hmr
+func = hmr.reload(func, excluded=["my_pkg.state"])
 ```
 
-## Implementation
-
-Current implementation is relied on the `importlib.reload`,
-which is not very graceful when handling state. Direct reading of
-AST may be a better solution for hot module reload in python,
-but it's too complicated, I might try it in the future.
 
 ## Acknowledgement
 
