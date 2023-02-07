@@ -1,9 +1,9 @@
 # package
-watchdog~=1.0.2
+watchdog
 
 # test
-pytest~=6.2.1
+pytest
 pytest-cov
 pytest-check
 pytest-xdist
-setuptools~=51.3.3
+setuptools
