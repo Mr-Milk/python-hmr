@@ -12,3 +12,6 @@ dynamic = ["version", "description"]
 requires-python = ">=3.8"
 urls = {Home="https://github.com/mr-milk/python-hmr"}
 dependencies = ["watchdog"]
+
+[tool.flit.module]
+name = "hmr"
