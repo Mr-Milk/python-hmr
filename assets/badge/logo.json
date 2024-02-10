@@ -1,8 +1,8 @@
 {
   "label": "",
-  "message": "Ruff",
+  "message": "python-hmr",
   "logoSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 675.78 675.78\"><defs><style>.cls-1{fill:none;}.cls-2{clip-path:url(#clip-path);}.cls-3{clip-path:url(#clip-path-2);}.cls-4{fill:#3c79ab;}.cls-5{fill:#fdd837;}.cls-6{fill:#fff;}</style><clipPath id=\"clip-path\" transform=\"translate(-276.95 -142.32)\"><rect class=\"cls-1\" width=\"1280\" height=\"960.41\"/></clipPath><clipPath id=\"clip-path-2\" transform=\"translate(-276.95 -142.32)\"><rect class=\"cls-1\" width=\"1280\" height=\"960.41\"/></clipPath></defs><title>Asset 1</title><g id=\"Layer_2\" data-name=\"Layer 2\"><g id=\"Layer_1-2\" data-name=\"Layer 1\"><g class=\"cls-2\"><g class=\"cls-3\"><path class=\"cls-4\" d=\"M614.84,142.32c-184,0-333.57,147-337.78,330C281,312.65,402.33,184.56,551.49,184.56,703.11,184.56,826,316.92,826,480.21a63.36,63.36,0,0,0,126.71,0c0-186.62-151.27-337.89-337.89-337.89\" transform=\"translate(-276.95 -142.32)\"/><path class=\"cls-5\" d=\"M614.84,818.09c184,0,333.58-147,337.79-329.94-3.9,159.61-125.27,287.71-274.43,287.71-151.63,0-274.54-132.37-274.54-295.65a63.36,63.36,0,1,0-126.71,0c0,186.61,151.28,337.88,337.89,337.88\" transform=\"translate(-276.95 -142.32)\"/><path class=\"cls-6\" d=\"M917.92,480.21a26.82,26.82,0,1,1-26.82-26.82,26.82,26.82,0,0,1,26.82,26.82\" transform=\"translate(-276.95 -142.32)\"/><path class=\"cls-6\" d=\"M366.05,493.1a26.82,26.82,0,1,1-26.82-26.82,26.83,26.83,0,0,1,26.82,26.82\" transform=\"translate(-276.95 -142.32)\"/></g></g></g></g></svg>",
-  "logoWidth": 10,
-  "labelColor": "grey",
-  "color": "#261230"
+  "logoWidth": 15,
+  "labelColor": "white",
+  "color": "#FEC550"
 }
