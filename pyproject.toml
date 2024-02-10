@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "python-hmr"
-authors = [{name = "Mr-Milk", email = "yb97643@um.edu.mo"}]
+authors = [{name = "Mr-Milk", email = "zym.zym1220@gmail.com"}]
 license = {file = "LICENSE"}
 readme = "README.md"
 classifiers = ["License :: OSI Approved :: MIT License"]
@@ -15,3 +15,9 @@ dependencies = ["watchdog"]
 
 [tool.flit.module]
 name = "hmr"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+]
