@@ -1,16 +1,26 @@
-<img src="https://raw.githubusercontent.com/Mr-Milk/python-hmr/d642a1054d5502a020f107bebecba41abeb4c7ea/img/logo.svg" alt="python-hmr logo" align="left" height="50" />
+<p align="center">
+    <picture align="center">
+    <img src="https://raw.githubusercontent.com/Mr-Milk/python-hmr/main/assets/logo.svg" 
+    alt="python-hmr logo"height="50"/>
+    </picture>
+</p>
+<p align="center">
+  <i>Better debugging experience with HMR</i>
+</p>
 
 # Python Hot Module Reload
 
 ![Test status](https://img.shields.io/github/actions/workflow/status/Mr-Milk/python-hmr/test.yaml?label=Test&logo=github&style=flat-square)
 ![pypi](https://img.shields.io/pypi/v/python-hmr?logoColor=white&style=flat-square)
 ![license-mit](https://img.shields.io/github/license/Mr-Milk/python-hmr?color=blue&style=flat-square)
+![Endpoint Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Mr-Milk/python-hmr/main/assets/badge/logo.json&style=social)
+
 
 Automatic reload your project when files are modified.
 
 No need to modify your source code. Works at any environment.
 
-![reload](https://github.com/Mr-Milk/python-hmr/blob/main/img/reload_func.gif?raw=true)
+![reload](https://github.com/Mr-Milk/python-hmr/blob/main/assets/showcase/reload_demo.gif?raw=true)
 
 Supported Syntax:
 
@@ -31,85 +41,98 @@ pip install python-hmr
 
 ## Quick Start
 
-Import your dev package as usual.
+> ![Caution]
+> From v0.3.0, there is only one API `hmr.reload`.
+
+Import your dev packages as usual. And add 2 lines 
+for automatically reload.
 
 ```python
-import my_pkg
-```
-
-Add 2 lines to automatically reload your source code.
-
-
-```python
-import my_pkg
+import dev
 
 import hmr
-my_pkg = hmr.reload(my_pkg)
+dev = hmr.reload(dev)
 ```
 
-Now you are ready to go!
-
-## Usage Manual
-
-### Module/Submodule reload
+If you have multiple modules to reload, you can do it like this.
 
 ```python
-import my_pkg.sub_module as sub
+from dev import run1, run2
 
 import hmr
-sub = hmr.reload(sub)
+run1, run2 = hmr.reload(run1, run2)
 ```
 
-### Function/Class reload
+Now you are ready to go! Try to modify the `run1` or `run2`
+and see the magic happens.
 
-No difference to reloading module
+
+## Detailed Usage
+
+
+### Function/Class instance
+
+When you try to add HMR for a function or class, remember to
+pass the name of the function or class instance without parenthesis.
 
 ```python
-from my_pkg import func, Class
+from dev import Runner
 
 import hmr
-func = hmr.reload(func)
-Class = hmr.reload(Class)
+Runner = hmr.reload(Runner)
+
+a = Runner()
+b = Runner()
 ```
 
-If your have multiple class instance, they will all be updated. 
-Both `a` and `b` will be updated.
+> ![Important]
+> Here, when both `a` and `b` will be updated after reloading. This maybe helpful
+> if you have a expansive state store within the class instance.
+>
+> However, it's suggested to reinitialize the class instance after reloading.
 
-```python
-a = Class()
-b = Class()
-```
 
-### @Decorated Function reload
+### @Decorated Function
 
 Use [functools.wraps](https://docs.python.org/3/library/functools.html#functools.wraps) to preserve 
 signature of your function, or the function information will be replaced by the decorator itself.
 
-### State handling
+```python
+import functools
 
-If your application is not stateless, it's suggested that you 
-group all your state variable into the same `.py` file like `state.py` 
+def work(f):
+    @functools.wraps(f)
+    def args(*arg, **kwargs):
+        return f(*arg, **kwargs)
+
+    return args
+```
+
+### Stateful application
+
+If your application is stateful, you can exclude the state from being reloaded.
+For simplicity, you can group all your state variable into the same `.py` file like `state.py` 
 and exclude that from being reloaded.
 
 > Make sure you know what you are doing. 
 > This could lead to unexpected behavior and unreproducible bugs.
 
 ```python
-import my_pkg
+import dev
 
 import hmr
-my_pkg = hmr.reload(my_pkg, excluded=["my_pkg.state"])
+dev = hmr.reload(dev, exclude=["dev.state"])
 ```
 
-The `my_pkg/state.py` will not be reloaded, the state will persist.
+In this way `dev/state.py` will not be reloaded, the state will persist.
 
-The same apply when reloading a function or class.
+This also apply when reloading a function or class.
 
 ```python
-from my_pkg import func
+from dev import run
 
 import hmr
-func = hmr.reload(func, excluded=["my_pkg.state"])
+run = hmr.reload(run, exclude=["dev.state"])
 ```
 
 
