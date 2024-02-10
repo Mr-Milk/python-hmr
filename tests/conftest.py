@@ -7,25 +7,29 @@ from uuid import uuid4
 
 import pytest
 
-TEST_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
+TEST_DIR = Path(__file__).parent
 
 
 # every function need to sleep for a while to wait for the reload to complete
 def pytest_addoption(parser):
-    parser.addoption("--wait", action="store", default=0.3, )
+    parser.addoption(
+        "--wait",
+        action="store",
+        default=0.3,
+    )
 
 
 def pytest_generate_tests(metafunc):
     option_value = float(metafunc.config.option.wait)
-    if 'wait' in metafunc.fixturenames and option_value is not None:
+    if "wait" in metafunc.fixturenames and option_value is not None:
         metafunc.parametrize("wait", [option_value])
 
 
 def read_replace_write(file: Union[str, Path], replace: Tuple):
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         raw = f.read()
 
-    with open(file, 'w') as f:
+    with open(file, "w") as f:
         text = raw.replace(*replace)
         f.write(text)
 
@@ -34,18 +38,18 @@ def read_replace_write(file: Union[str, Path], replace: Tuple):
 # we can't reload the same pkg name
 @pytest.fixture
 def pkg_name():
-    return f'my_pkg_{str(uuid4())}'
+    return f"my_pkg_{str(uuid4())}"
 
 
 def copy_pkg(pkg_name):
-    pkg = TEST_DIR.parent / 'my_pkg'
+    pkg = TEST_DIR / "my_pkg"
     dest = TEST_DIR / pkg_name
     if dest.exists():
         shutil.rmtree(dest)
     shutil.copytree(pkg, dest)
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def create_package(pkg_name):
     copy_pkg(pkg_name)
     pkg_dir = TEST_DIR / pkg_name
@@ -56,7 +60,7 @@ def create_package(pkg_name):
     except Exception as e:
         pass
     try:
-        if platform.system() in ['Linux', 'Darwin']:
+        if platform.system() in ["Linux", "Darwin"]:
             os.system(f"rm -rf {pkg_dir.absolute()}")
         else:
             os.system(f"rmdir \\Q \\S {pkg_dir.absolute()}")
@@ -64,20 +68,24 @@ def create_package(pkg_name):
         pass
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def package(pkg_name):
     pkg_dir = TEST_DIR / pkg_name
-    pkg_init: Path = pkg_dir / '__init__.py'
-    pkg_file_module: Path = pkg_dir / 'file_module.py'
-    pkg_sub_module_init: Path = pkg_dir / 'sub_module' / '__init__.py'
-    pkg_subsub_module_init: Path = pkg_dir / 'sub_module' / 'subsub_module' / '__init__.py'
+    pkg_init: Path = pkg_dir / "__init__.py"
+    pkg_file_module: Path = pkg_dir / "file_module.py"
+    pkg_sub_module_init: Path = pkg_dir / "sub_module" / "__init__.py"
+    pkg_subsub_module_init: Path = (
+        pkg_dir / "sub_module" / "subsub_module" / "__init__.py"
+    )
 
     class Package:
         pkg_name = pkg_name
-        pkg_init: Path = pkg_dir / '__init__.py'
-        pkg_file_module: Path = pkg_dir / 'file_module.py'
-        pkg_sub_module_init: Path = pkg_dir / 'sub_module' / '__init__.py'
-        pkg_subsub_module_init: Path = pkg_dir / 'sub_module' / 'subsub_module' / '__init__.py'
+        pkg_init: Path = pkg_dir / "__init__.py"
+        pkg_file_module: Path = pkg_dir / "file_module.py"
+        pkg_sub_module_init: Path = pkg_dir / "sub_module" / "__init__.py"
+        pkg_subsub_module_init: Path = (
+            pkg_dir / "sub_module" / "subsub_module" / "__init__.py"
+        )
 
         @staticmethod
         def raise_syntax_error():
@@ -99,11 +107,15 @@ def package(pkg_name):
 
         @staticmethod
         def modify_file_module_func():
-            read_replace_write(pkg_file_module, ("Hi from file_func", "Hello from file_func"))
+            read_replace_write(
+                pkg_file_module, ("Hi from file_func", "Hello from file_func")
+            )
 
         @staticmethod
         def modify_sub_module_func():
-            read_replace_write(pkg_sub_module_init, ("Hi from sub_func", "Hello from sub_func"))
+            read_replace_write(
+                pkg_sub_module_init, ("Hi from sub_func", "Hello from sub_func")
+            )
 
         @staticmethod
         def modify_sub_module_decorated_func():
