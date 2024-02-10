@@ -1,4 +1,4 @@
-from my_pkg.wrap import wrap
+from tests.my_pkg.wrap import wrap
 
 
 def sub_func():

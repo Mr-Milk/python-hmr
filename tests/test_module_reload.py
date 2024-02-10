@@ -5,17 +5,18 @@ from time import sleep
 
 import pytest
 
-from hmr import Reloader
+from hmr import reload
 
 sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
 
 # import X
 
+
 def test_module(package, pkg_name, wait):
     my_pkg = importlib.import_module(pkg_name)  # import pkg_name
 
-    my_pkg = Reloader(my_pkg, excluded=['my_pkg.sub_module'])
+    my_pkg = reload(my_pkg, exclude=["my_pkg.sub_module"])
     assert my_pkg.func() == "Hi from func"
     package.modify_module_func()
     sleep(wait)
@@ -26,7 +27,7 @@ def test_module(package, pkg_name, wait):
 # import X.Y as A
 def test_submodule(package, pkg_name, wait):
     sub = importlib.import_module(f"{pkg_name}.sub_module")
-    sub = Reloader(sub)
+    sub = reload(sub)
 
     assert sub.sub_func() == "Hi from sub_func"
 
@@ -38,7 +39,7 @@ def test_submodule(package, pkg_name, wait):
 @pytest.mark.xfail
 def test_syntax_error(package, pkg_name, wait):
     my_pkg = importlib.import_module(pkg_name)  # import pkg_name
-    my_pkg = Reloader(my_pkg)
+    my_pkg = reload(my_pkg)
     # sleep(wait)
     # check.equal(my_pkg.func(), "Hi from func")
     assert my_pkg.func() == "Hi from func"
