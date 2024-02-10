@@ -1,14 +1,14 @@
+# Python Hot Module Reload
+
 <p align="center">
     <picture align="center">
     <img src="https://raw.githubusercontent.com/Mr-Milk/python-hmr/main/assets/logo.svg" 
-    alt="python-hmr logo"height="50"/>
+    alt="python-hmr logo" height="50"/>
     </picture>
 </p>
 <p align="center">
   <i>Better debugging experience with HMR</i>
 </p>
-
-# Python Hot Module Reload
 
 ![Test status](https://img.shields.io/github/actions/workflow/status/Mr-Milk/python-hmr/test.yaml?label=Test&logo=github&style=flat-square)
 ![pypi](https://img.shields.io/pypi/v/python-hmr?logoColor=white&style=flat-square)
@@ -18,7 +18,7 @@
 
 Automatic reload your project when files are modified.
 
-No need to modify your source code. Works at any environment.
+No need to modify your source code. Works in any environment.
 
 ![reload](https://github.com/Mr-Milk/python-hmr/blob/main/assets/showcase/reload_demo.gif?raw=true)
 
@@ -41,11 +41,11 @@ pip install python-hmr
 
 ## Quick Start
 
-> ![Caution]
-> From v0.3.0, there is only one API `hmr.reload`.
+> [!CAUTION]
+> From v0.3.0, there is only one API, `hmr.reload`.
 
 Import your dev packages as usual. And add 2 lines 
-for automatically reload.
+for automatically reloading.
 
 ```python
 import dev
@@ -64,7 +64,7 @@ run1, run2 = hmr.reload(run1, run2)
 ```
 
 Now you are ready to go! Try to modify the `run1` or `run2`
-and see the magic happens.
+and see the magic happen.
 
 
 ## Detailed Usage
@@ -85,9 +85,9 @@ a = Runner()
 b = Runner()
 ```
 
-> ![Important]
-> Here, when both `a` and `b` will be updated after reloading. This maybe helpful
-> if you have a expansive state store within the class instance.
+> [!IMPORTANT]
+> Here, when both `a` and `b` will be updated after reloading. This may be helpful
+> if you have an expansive state store within the class instance.
 >
 > However, it's suggested to reinitialize the class instance after reloading.
 
